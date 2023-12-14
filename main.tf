@@ -39,7 +39,7 @@ resource "aws_launch_template" "main" {
     tags = merge(local.tags, {Name = "${local.name_prefix}-ec2" })
   }
 
-  user_data = filebase64(templatefile("${path.module}/userdata.sh"
+  user_data = filebase64(templatefile("${path.module}/userdata.sh",
     {
       component = var.component
     }))
@@ -47,9 +47,9 @@ resource "aws_launch_template" "main" {
 
 resource "aws_autoscaling_group" "main" {
   vpc_zone_identifier = var.subnet_ids
-  desired_capacity   = 1
-  max_size           = 3
-  min_size           = 1
+  desired_capacity   = var.desired_capacity
+  max_size           = var.max_size
+  min_size           = var.min_size
 
   launch_template {
     id      = aws_launch_template.main.id
