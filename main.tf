@@ -28,3 +28,31 @@ resource "aws_security_group" "main" {
   }
 
 }
+resource "aws_launch_template" "main" {
+  name_prefix   = local.name_prefix
+  image_id      = var.ami
+  instance_type = var.instance_type
+  vpc_security_group_ids = [aws_security_group.main.id]
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags, {Name = "${local.name_prefix}-ec2" })
+  }
+
+  user_data = filebase64(templatefile"${path.module}/userdata.sh"
+    {
+      component = var.component
+    })
+}
+
+resource "aws_autoscaling_group" "main" {
+  vpc_zone_identifier = var.subnet_ids
+  desired_capacity   = 1
+  max_size           = 3
+  min_size           = 1
+
+  launch_template {
+    id      = aws_launch_template.main.id
+    version = "$Latest"
+  }
+}
