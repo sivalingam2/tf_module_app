@@ -5,3 +5,4 @@ variable "port" {}
 variable "ssh_ingress_cidr" {}
 variable "sg_ingress_cidr" {}
 variable "component" {}
+variable "" {}
