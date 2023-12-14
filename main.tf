@@ -39,10 +39,10 @@ resource "aws_launch_template" "main" {
     tags = merge(local.tags, {Name = "${local.name_prefix}-ec2" })
   }
 
-  user_data = filebase64(templatefile"${path.module}/userdata.sh"
+  user_data = filebase64(templatefile("${path.module}/userdata.sh"
     {
       component = var.component
-    })
+    }))
 }
 
 resource "aws_autoscaling_group" "main" {
