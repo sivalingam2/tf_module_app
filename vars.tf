@@ -8,4 +8,5 @@ variable "component" {}
 variable "subnet_ids" {}
 variable "ami" {}
 variable "zone_id" {}
+variable "instance_type" {}
 
