@@ -83,7 +83,7 @@ resource "aws_lb_listener_rule" "main" {
 
   condition {
     host_header {
-      values = ["${var.component}-${var.env}.sivadevops22.online"]
+      values = [ var.component == "frontend" ? "${var.env}.sivadevops22.online" : "${var.component}-${var.env}.sivadevops22.online"]
     }
   }
 }
