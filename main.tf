@@ -93,7 +93,7 @@ resource "aws_lb_target_group" "public" {
   port     = var.port
   target_type = "ip"
   protocol = "HTTP"
-  default_vpc_id   = var.default_vpc_id
+  vpc_id   = var.default_vpc_id
 }
 resource "aws_lb_target_group_attachment" "public" {
   count           = var.component == "frontend" ? length(data.dns_a_record_set.private_alb_name.addrs) : 0
@@ -108,7 +108,7 @@ resource "aws_lb_target_group_attachment" "public" {
 #
 #  action {
 #    type             = "forward"
-#    target_group_arn = aws_lb_target_group.test.arn
+#    target_group_arn = aws_lb_target_group.public.arn
 #  }
 #
 #
