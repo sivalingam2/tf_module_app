@@ -103,6 +103,7 @@ resource "aws_lb_target_group_attachment" "public" {
   availability_zone = "all"
 }
 resource "aws_lb_listener_rule" "public" {
+  count =  var.component == "frontend" ? 1 : 0
   listener_arn = var.public_lb_listener
   priority     = var.priority
 
