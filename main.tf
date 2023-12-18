@@ -100,19 +100,19 @@ resource "aws_lb_target_group_attachment" "public" {
   target_id        = element(data.dns_a_record_set.private_alb_name.addrs, count.index )
   port             = 80
 }
-resource "aws_lb_listener_rule" "main" {
-  listener_arn = var.private_lb_listener
-  priority     = var.priority
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.test.arn
-  }
-
-
-  condition {
-    host_header {
-      values = [ var.component == "frontend" ? "${var.env}.sivadevops22.online" : "${var.component}-${var.env}.sivadevops22.online"]
-    }
-  }
-}
+#resource "aws_lb_listener_rule" "main" {
+#  listener_arn = var.private_lb_listener
+#  priority     = var.priority
+#
+#  action {
+#    type             = "forward"
+#    target_group_arn = aws_lb_target_group.test.arn
+#  }
+#
+#
+#  condition {
+#    host_header {
+#      values = [ var.component == "frontend" ? "${var.env}.sivadevops22.online" : "${var.component}-${var.env}.sivadevops22.online"]
+#    }
+#  }
+#}
