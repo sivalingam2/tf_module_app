@@ -100,6 +100,8 @@ resource "aws_lb_target_group_attachment" "public" {
   target_group_arn = aws_lb_target_group.public[0].arn
   target_id        = element(tolist(data.dns_a_record_set.private_alb_name.addrs), count.index )
   port             = 80
+  default_vpc_id   = var.default_vpc_id
+#  availability_zone = "[us-east-1a]"
 }
 #resource "aws_lb_listener_rule" "main" {
 #  listener_arn = var.private_lb_listener
