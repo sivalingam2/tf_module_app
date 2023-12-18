@@ -93,15 +93,14 @@ resource "aws_lb_target_group" "public" {
   port     = var.port
   target_type = "ip"
   protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  default_vpc_id   = var.default_vpc_id
 }
 resource "aws_lb_target_group_attachment" "public" {
   count           = var.component == "frontend" ? length(data.dns_a_record_set.private_alb_name.addrs) : 0
   target_group_arn = aws_lb_target_group.public[0].arn
   target_id        = element(tolist(data.dns_a_record_set.private_alb_name.addrs), count.index )
   port             = 80
-  default_vpc_id   = var.default_vpc_id
-#  availability_zone = "[us-east-1a]"
+  availability_zone = "all"
 }
 #resource "aws_lb_listener_rule" "main" {
 #  listener_arn = var.private_lb_listener
