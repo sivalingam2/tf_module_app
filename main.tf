@@ -97,7 +97,7 @@ resource "aws_lb_target_group" "public" {
   vpc_id   = var.default_vpc_id
 }
 resource "aws_lb_target_group_attachment" "public" {
-  count           = var.component == "frontend" ? length(tolist(data.dns_a_record_set.private_alb.addrs)) : 0
+  count           = var.component == "frontend" ? length(var.subnet_ids) : 0
   target_group_arn = aws_lb_target_group.public[0].arn
   target_id        = element(tolist(data.dns_a_record_set.private_alb.addrs), count.index )
   port             = 80
@@ -120,3 +120,42 @@ resource "aws_lb_listener_rule" "public" {
     }
   }
 }
+#resource "aws_iam_policy" "main" {
+#  name        = "${local.name_prefix}-policy"
+#  path        = "/"
+#  description = "${local.name_prefix}-policy"
+#
+#  policy = jsonencode({
+#    Version = "2012-10-17"
+#    Statement = [
+#      {
+#        Action = [
+#          "ec2:Describe*",
+#        ]
+#        Effect   = "Allow"
+#        Resource = "*"
+#      },
+#    ]
+#  })
+#}
+#resource "aws_iam_role" "main" {
+#  name = "${local.name_prefix}-policy"
+#
+#  # Terraform's "jsonencode" function converts a
+#  # Terraform expression result to valid JSON syntax.
+#  assume_role_policy = jsonencode({
+#    Version = "2012-10-17"
+#    Statement = [
+#      {
+#        Action = "sts:AssumeRole"
+#        Effect = "Allow"
+#        Sid    = ""
+#        Principal = {
+#          Service = "ec2.amazonaws.com"
+#        }
+#      },
+#    ]
+#  })
+#
+#  tags = merge(local.tags, {Name = "${local.name_prefix}-role" })
+#}
