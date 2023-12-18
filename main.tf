@@ -102,19 +102,19 @@ resource "aws_lb_target_group_attachment" "public" {
   port             = 80
   availability_zone = "all"
 }
-#resource "aws_lb_listener_rule" "main" {
-#  listener_arn = var.private_lb_listener
-#  priority     = var.priority
-#
-#  action {
-#    type             = "forward"
-#    target_group_arn = aws_lb_target_group.public.arn
-#  }
-#
-#
-#  condition {
-#    host_header {
-#      values = [ var.component == "frontend" ? "${var.env}.sivadevops22.online" : "${var.component}-${var.env}.sivadevops22.online"]
-#    }
-#  }
-#}
+resource "aws_lb_listener_rule" "public" {
+  listener_arn = var.public_lb_listener
+  priority     = var.priority
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.public[0].arn
+  }
+
+
+  condition {
+    host_header {
+      values = [ "${var.env}.sivadevops22.online" ]
+    }
+  }
+}
