@@ -28,11 +28,72 @@ resource "aws_security_group" "main" {
   }
 
 }
+resource "aws_iam_policy" "main" {
+  name        = "${local.name_prefix}-policy"
+  path        = "/"
+  description = "${local.name_prefix}-policy"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "VisualEditor0",
+        "Effect": "Allow",
+        "Action": [
+          "ssm:GetParameterHistory",
+          "ssm:GetParametersByPath",
+          "ssm:GetParameters",
+          "ssm:GetParameter"
+        ],
+        "Resource": "arn:aws:ssm:us-east-1:372609574969:parameter/docudb.dev.*"
+      },
+      {
+        "Sid": "VisualEditor1",
+        "Effect": "Allow",
+        "Action": "ssm:DescribeParameters",
+        "Resource": "*"
+      }
+    ]
+  })
+}
+resource "aws_iam_role" "main" {
+  name = "${local.name_prefix}-policy"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+
+  tags = merge(local.tags, {Name = "${local.name_prefix}-role" })
+}
+resource "aws_iam_role_policy_attachment" "test-attach" {
+  role       = aws_iam_role.main.name
+  policy_arn = aws_iam_policy.main.arn
+}
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "${local.name_prefix}-profile"
+  role = aws_iam_role.main.name
+}
+
 resource "aws_launch_template" "main" {
   name_prefix   = local.name_prefix
   image_id      = var.ami
   instance_type = var.instance_type
   vpc_security_group_ids = [aws_security_group.main.id]
+  iam_instance_profile {
+    name = "${local.name_prefix}-role"
+  }
 
   tag_specifications {
     resource_type = "instance"
@@ -119,57 +180,4 @@ resource "aws_lb_listener_rule" "public" {
       values = ["${var.env}.sivadevops22.online"]
     }
   }
-}
-resource "aws_iam_policy" "main" {
-  name        = "${local.name_prefix}-policy"
-  path        = "/"
-  description = "${local.name_prefix}-policy"
-
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "VisualEditor0",
-        "Effect": "Allow",
-        "Action": [
-          "ssm:GetParameterHistory",
-          "ssm:GetParametersByPath",
-          "ssm:GetParameters",
-          "ssm:GetParameter"
-        ],
-        "Resource": "arn:aws:ssm:us-east-1:372609574969:parameter/docudb.dev.*"
-      },
-      {
-        "Sid": "VisualEditor1",
-        "Effect": "Allow",
-        "Action": "ssm:DescribeParameters",
-        "Resource": "*"
-      }
-    ]
-  })
-}
-resource "aws_iam_role" "main" {
-  name = "${local.name_prefix}-policy"
-
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
-
-  tags = merge(local.tags, {Name = "${local.name_prefix}-role" })
-}
-resource "aws_iam_role_policy_attachment" "test-attach" {
-  role       = aws_iam_role.main.name
-  policy_arn = aws_iam_policy.main.arn
 }
