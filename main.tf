@@ -59,8 +59,6 @@ resource "aws_iam_policy" "main" {
 resource "aws_iam_role" "main" {
   name = "${local.name_prefix}-policy"
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -95,16 +93,17 @@ resource "aws_launch_template" "main" {
     name = "${local.name_prefix}-role"
   }
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(local.tags, {Name = "${local.name_prefix}-ec2" })
-  }
 
   user_data = base64encode(templatefile("${path.module}/userdata.sh",
     {
       component = var.component
       env       = var.env
     }))
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags, {Name = "${local.name_prefix}-ec2" })
+  }
 }
 
 resource "aws_autoscaling_group" "main" {
